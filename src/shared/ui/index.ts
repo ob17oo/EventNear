@@ -1,0 +1,1 @@
+export { InputComp } from './InputComp'
