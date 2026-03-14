@@ -1,4 +1,5 @@
 'use client'
+import { TUserCity } from "@/entities/city/model/city.types";
 import { useLockScroll } from "@/shared/hooks/useLockScroll";
 import { InputComp } from "@/shared/ui";
 import { CityDialogComp } from "@/widgets/CityComp/ui";
@@ -10,9 +11,10 @@ import { useState } from "react";
 
 interface HeaderCompProps{
     session: Session | null
+    city: TUserCity[];
 }
 
-export function HeaderComp({session}:HeaderCompProps){
+export function HeaderComp({session, city}:HeaderCompProps){
     const router = useRouter()
     const [isOpenMenu, setIsOpenMenu] = useState(false)
     const [isOpenCityPicker, setIsOpenCityPicker] = useState(false)
@@ -37,7 +39,7 @@ export function HeaderComp({session}:HeaderCompProps){
                                 <span className="text-lg">{user?.city.name}</span>
                             </button>
 
-                            <CityDialogComp isOpen={isOpenCityPicker} onClose={() => setIsOpenCityPicker(false)}/>
+                            <CityDialogComp userCity={user.city} city={city} isOpen={isOpenCityPicker} onClose={() => setIsOpenCityPicker(false)}/>
 
                             <button onClick={() => router.push('/order')} className="flex items-center gap-1.5 cursor-pointer">
                                 <Image width={28} height={28} src={'/static/icons/ticket.svg'} alt="Header-Ticket"/>

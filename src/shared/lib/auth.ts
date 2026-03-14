@@ -110,7 +110,7 @@ export const authOption: NextAuthOptions = {
         })
     ],
     callbacks: {
-        async jwt({ token, user, session }){
+        async jwt({ token, user, session, trigger }){
             if(user){
                 token.id = user.id;
                 token.userName = user.userName;
@@ -119,7 +119,50 @@ export const authOption: NextAuthOptions = {
                 token.role = user.role;
                 token.cityId = user.cityId;
                 token.city = user.city;
-            }            
+            }    
+            
+            if(trigger === 'update'){
+                try {
+                    const updateDataUser = await prisma.user.findUnique({
+                        where: {
+                            id: token.id
+                        },
+                        select: {
+                            userName: true,
+                            email: true,
+                            imageUrl: true,
+                            role: true,
+                            cityId: true,
+                            city: true
+                        }
+                    })
+
+                    if(updateDataUser){
+                        token.userName = updateDataUser.userName
+                        token.email = updateDataUser.email
+                        token.imageUrl = updateDataUser.imageUrl
+                        token.role = updateDataUser.role
+                        token.cityId = updateDataUser.cityId
+                        token.city = updateDataUser.city
+                    }
+
+                } catch(error: unknown){
+                    if(process.env.NODE_ENV === 'development'){
+                        console.log(`Error update JWT token: ${error}`)
+                    }
+                    throw new Error(`Error updating JWT data`)
+                }
+            }
+
+            if(session?.user){
+                token.userName = session.userName
+                token.email = session.email
+                token.imageUrl = session.imageUrl
+                token.role = session.role
+                token.cityId = session.cityId
+                token.city = session.city
+            }
+            
             return token;
         },
 
